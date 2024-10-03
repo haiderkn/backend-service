@@ -38,12 +38,12 @@ jobs:
   unittest:
     runs-on: ubuntu-latest
 
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Build image
-      run: docker compose build
+      - name: Build image
+        run: docker compose build
 
-    - name: Run Unit Tests
-      run: docker compose -f docker-compose.yml run --rm app sh -c "python manage.py test"
+      - name: Run Unit Tests
+        run: docker compose -f docker-compose.yml run --rm app sh -c "python manage.py test"
