@@ -4,7 +4,7 @@ networks:
 
 services:
   app:
-    image: django-app
+    image: backend-service:14.10.2024
     build:
       context: .
       dockerfile: ./Dockerfile
