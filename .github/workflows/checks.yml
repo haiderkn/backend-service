@@ -3,7 +3,7 @@ name: Run Unit & Lint Test
 on:
   push:
     branches:
-      - 'feature/*'
+      - 'main'
 
 jobs:
 
@@ -26,7 +26,7 @@ jobs:
           
       - name: Run flake8 linter
         run: |
-          git fetch origin feature/django-app --depth=1
+          git fetch origin main --depth=1
           CHANGED_FILES=$(git diff --name-only FETCH_HEAD HEAD -- '*.py')
           echo "$CHANGED_FILES"
           if [ -n "$CHANGED_FILES" ]; then
