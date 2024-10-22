@@ -17,7 +17,7 @@ services:
       - POSTGRES_PASSWORD=haider24
 
   django-app:
-    image: backend-service:latest
+    image: haider57/backend-service:latest
     container_name: django-app
     expose:
       - 8000
