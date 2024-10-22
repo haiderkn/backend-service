@@ -1,0 +1,48 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - main
+env:
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  PRIVATE_KEY: ${{ secrets.RSA_KEY_FOR_APP_EC2 }}
+  INSTANCE_IP: ${{ vars.INSTANCE_IP }}
+
+jobs:
+  build:
+    runs_on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate required .env file
+        run: |
+          echo DEBUG=True >> .env
+
+      - name: Build and push Docker image
+        uses: docker/build-push-actions@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: haider57/backend-service:latest
+
+      - name: Copy docker-compose and nginx files to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ env.INSTANCE_IP }}
+          username: ec2-user
+          key: ${{ secrets.RSA_KEY_FOR_APP_EC2 }}
+          source: "docker-compose.production.yaml,nginx.conf"
+          target: "~/"
+
+      - name: SSH into VM and deploy Docker image
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.INSTANCE_IP }}
+          username: ec2-user
+          key: ${{ secrets.RSA_KEY_FOR_APP_EC2 }}
+          script: |
+            docker compose up -d
+            docker image prune -f
