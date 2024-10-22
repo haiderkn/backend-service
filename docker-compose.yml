@@ -1,41 +1,18 @@
-networks:
-  local-network:
-    driver: bridge
-
 services:
-  app:
-    image: backend-service:15.10.2024
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+  django-app:
+    image: haider57/backend-service:latest
+    container_name: django-app
+    expose:
+      - 8000
+    environment:
+      - DEBUG=False
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
     ports:
-      - "8000:8000"
-    environment:
-      DJANGO_APP: run.py
-      DJANGO_DEBUG: 1
+      - "80:80"
     volumes:
-      - ./app:/app
-    networks:
-      - local-network
-    command: >
-      sh -c "
-      python manage.py makemigrations &&
-      python manage.py migrate &&
-      python manage.py runserver 0.0.0.0:8000"
-
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - db
-
-  db:
-    image: postgres:alpine3.20
-    volumes:
-      - ./dev-db-data:/var/lib/postgresql/data
-    networks:
-      - local-network
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=haider
-      - POSTGRES_PASSWORD=haider24
-
-volumes:
-  dev-db-data:
+      - django-app
